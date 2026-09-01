@@ -1,5 +1,7 @@
+import java.util.Scanner;
+
 /**
- * Greets the user when the chatbot starts and then exits.
+ * Greets the user, echoes their input, and exits when they enter "bye".
  */
 public class Bill {
     public static void main(String[] args) {
@@ -15,7 +17,16 @@ public class Bill {
         System.out.println("Hello! I'm Bill.");
         System.out.println("What can I do for you?");
         System.out.println(horizontalLine);
-        System.out.println("Bye. Hope to see you again soon!");
+
+        Scanner scanner = new Scanner(System.in);
+        String input = scanner.nextLine();
+        while (!input.equals("bye")) {
+            System.out.println(input);
+            System.out.println(horizontalLine);
+            input = scanner.nextLine();
+        }
+
+        System.out.println("Bye. Have a good day mate!");
         System.out.println(horizontalLine);
     }
 }
