@@ -1,7 +1,7 @@
 import java.util.Scanner;
 
 /**
- * Greets the user, stores tasks, lists them on request, and exits on "bye".
+ * Greets the user and manages tasks until the user enters "bye".
  */
 public class Bill {
     public static void main(String[] args) {
@@ -20,13 +20,26 @@ public class Bill {
 
         Scanner scanner = new Scanner(System.in);
         String[] tasks = new String[100];
+        boolean[] isDone = new boolean[100];
         int taskCount = 0;
         String input = scanner.nextLine();
         while (!input.equals("bye")) {
             if (input.equals("list")) {
+                System.out.println("Here are the tasks in your list:");
                 for (int i = 0; i < taskCount; i++) {
-                    System.out.println((i + 1) + ". " + tasks[i]);
+                    String status = isDone[i] ? "[X]" : "[ ]";
+                    System.out.println((i + 1) + "." + status + " " + tasks[i]);
                 }
+            } else if (input.startsWith("mark ")) {
+                int taskIndex = Integer.parseInt(input.substring(5)) - 1;
+                isDone[taskIndex] = true;
+                System.out.println("Nice! I've marked this task as done:");
+                System.out.println("  [X] " + tasks[taskIndex]);
+            } else if (input.startsWith("unmark ")) {
+                int taskIndex = Integer.parseInt(input.substring(7)) - 1;
+                isDone[taskIndex] = false;
+                System.out.println("OK, I've marked this task as not done yet:");
+                System.out.println("  [ ] " + tasks[taskIndex]);
             } else {
                 tasks[taskCount] = input;
                 taskCount++;
