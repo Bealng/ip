@@ -16,32 +16,50 @@ public class Bill {
         System.out.print(banner);
         System.out.println("Hello! I'm Bill.");
         System.out.println("What can I do for you?");
+        System.out.println("Type 'help' if you'd like a tour of my commands.");
         System.out.println(horizontalLine);
 
         Scanner scanner = new Scanner(System.in);
-        String[] tasks = new String[100];
-        boolean[] isDone = new boolean[100];
+        Task[] tasks = new Task[100];
         int taskCount = 0;
         String input = scanner.nextLine();
-        while (!input.equals("bye")) {
-            if (input.equals("list")) {
+        while (!input.equalsIgnoreCase("bye")) {
+            String normalizedInput = input.toLowerCase();
+            if (normalizedInput.equals("list")) {
                 System.out.println("Here are the tasks in your list:");
                 for (int i = 0; i < taskCount; i++) {
-                    String status = isDone[i] ? "[X]" : "[ ]";
-                    System.out.println((i + 1) + "." + status + " " + tasks[i]);
+                    System.out.println((i + 1) + "." + tasks[i]);
                 }
-            } else if (input.startsWith("mark ")) {
+            } else if (normalizedInput.equals("help")) {
+                System.out.println("Here are the commands I understand:");
+                System.out.println("  list          - show every task");
+                System.out.println("  mark NUMBER   - mark a task as done");
+                System.out.println("  unmark NUMBER - mark a task as not done");
+                System.out.println("  stats         - show your progress");
+                System.out.println("  bye           - exit Bill");
+                System.out.println("  Any other text adds a new task.");
+            } else if (normalizedInput.equals("stats")) {
+                int completedCount = 0;
+                for (int i = 0; i < taskCount; i++) {
+                    if (tasks[i].isDone()) {
+                        completedCount++;
+                    }
+                }
+                int remainingCount = taskCount - completedCount;
+                System.out.println("Task stats: " + taskCount + " total, "
+                        + completedCount + " done, " + remainingCount + " remaining.");
+            } else if (normalizedInput.startsWith("mark ")) {
                 int taskIndex = Integer.parseInt(input.substring(5)) - 1;
-                isDone[taskIndex] = true;
+                tasks[taskIndex].markAsDone();
                 System.out.println("Nice! I've marked this task as done:");
-                System.out.println("  [X] " + tasks[taskIndex]);
-            } else if (input.startsWith("unmark ")) {
+                System.out.println("  " + tasks[taskIndex]);
+            } else if (normalizedInput.startsWith("unmark ")) {
                 int taskIndex = Integer.parseInt(input.substring(7)) - 1;
-                isDone[taskIndex] = false;
+                tasks[taskIndex].markAsNotDone();
                 System.out.println("OK, I've marked this task as not done yet:");
-                System.out.println("  [ ] " + tasks[taskIndex]);
+                System.out.println("  " + tasks[taskIndex]);
             } else {
-                tasks[taskCount] = input;
+                tasks[taskCount] = new Task(input);
                 taskCount++;
                 System.out.println("added: " + input);
             }
