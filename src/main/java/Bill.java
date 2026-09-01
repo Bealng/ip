@@ -54,8 +54,14 @@ public class Bill {
             markTask(userInput, tasks);
         } else if (normalizedInput.startsWith("unmark ")) {
             unmarkTask(userInput, tasks);
+        } else if (normalizedInput.startsWith("todo ")) {
+            return addTodo(userInput, tasks, taskCount);
+        } else if (normalizedInput.startsWith("deadline ")) {
+            return addDeadline(userInput, tasks, taskCount);
+        } else if (normalizedInput.startsWith("event ")) {
+            return addEvent(userInput, tasks, taskCount);
         } else {
-            return addTask(userInput, tasks, taskCount);
+            return addTask(new Todo(userInput), tasks, taskCount);
         }
 
         return taskCount;
@@ -79,9 +85,12 @@ public class Bill {
         System.out.println("  list          - show every task");
         System.out.println("  mark NUMBER   - mark a task as done");
         System.out.println("  unmark NUMBER - mark a task as not done");
+        System.out.println("  todo TASK     - add a task without a date or time");
+        System.out.println("  deadline TASK /by TIME - add a task with a deadline");
+        System.out.println("  event TASK /from START /to END - add an event");
         System.out.println("  stats         - show your progress");
         System.out.println("  bye           - exit Bill");
-        System.out.println("  Any other text adds a new task.");
+        System.out.println("  Any other text adds a todo.");
     }
 
     /**
@@ -135,12 +144,49 @@ public class Bill {
     }
 
     /**
-     * Adds a task and returns the updated task count.
+     * Creates a todo from a todo command.
      */
-    private static int addTask(String description, Task[] tasks, int taskCount) {
-        tasks[taskCount] = new Task(description);
-        System.out.println("added: " + description);
-        return taskCount + 1;
+    private static int addTodo(String userInput, Task[] tasks, int taskCount) {
+        String description = userInput.substring("todo ".length());
+        return addTask(new Todo(description), tasks, taskCount);
+    }
+
+    /**
+     * Creates a deadline from a deadline command.
+     */
+    private static int addDeadline(String userInput, Task[] tasks, int taskCount) {
+        String deadlineDetails = userInput.substring("deadline ".length());
+        int byIndex = deadlineDetails.toLowerCase().indexOf(" /by ");
+        String description = deadlineDetails.substring(0, byIndex);
+        String by = deadlineDetails.substring(byIndex + " /by ".length());
+        return addTask(new Deadline(description, by), tasks, taskCount);
+    }
+
+    /**
+     * Creates an event from an event command.
+     */
+    private static int addEvent(String userInput, Task[] tasks, int taskCount) {
+        String eventDetails = userInput.substring("event ".length());
+        String normalizedDetails = eventDetails.toLowerCase();
+        int fromIndex = normalizedDetails.indexOf(" /from ");
+        int toIndex = normalizedDetails.indexOf(" /to ", fromIndex);
+        String description = eventDetails.substring(0, fromIndex);
+        String from = eventDetails.substring(fromIndex + " /from ".length(), toIndex);
+        String to = eventDetails.substring(toIndex + " /to ".length());
+        return addTask(new Event(description, from, to), tasks, taskCount);
+    }
+
+    /**
+     * Stores and displays a newly created task.
+     */
+    private static int addTask(Task task, Task[] tasks, int taskCount) {
+        tasks[taskCount] = task;
+        int updatedTaskCount = taskCount + 1;
+        String taskLabel = updatedTaskCount == 1 ? "task" : "tasks";
+        System.out.println("Got it. I've added this task:");
+        System.out.println("  " + task);
+        System.out.println("Now you have " + updatedTaskCount + " " + taskLabel + " in the list.");
+        return updatedTaskCount;
     }
 
     /**

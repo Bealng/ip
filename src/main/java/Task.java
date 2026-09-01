@@ -39,6 +39,24 @@ public class Task {
     }
 
     /**
+     * Returns the letter used to identify this task's type.
+     *
+     * @return Task type icon.
+     */
+    protected String getTypeIcon() {
+        return "T";
+    }
+
+    /**
+     * Returns any timing information displayed after the task description.
+     *
+     * @return Additional display details.
+     */
+    protected String getDetails() {
+        return "";
+    }
+
+    /**
      * Returns the task status and description for display.
      *
      * @return Display form of this task.
@@ -46,6 +64,6 @@ public class Task {
     @Override
     public String toString() {
         String statusIcon = isDone ? "X" : " ";
-        return "[" + statusIcon + "] " + description;
+        return "[" + getTypeIcon() + "][" + statusIcon + "] " + description + getDetails();
     }
 }
