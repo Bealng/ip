@@ -1,7 +1,7 @@
 import java.util.Scanner;
 
 /**
- * Greets the user, echoes their input, and exits when they enter "bye".
+ * Greets the user, stores tasks, lists them on request, and exits on "bye".
  */
 public class Bill {
     public static void main(String[] args) {
@@ -19,9 +19,19 @@ public class Bill {
         System.out.println(horizontalLine);
 
         Scanner scanner = new Scanner(System.in);
+        String[] tasks = new String[100];
+        int taskCount = 0;
         String input = scanner.nextLine();
         while (!input.equals("bye")) {
-            System.out.println(input);
+            if (input.equals("list")) {
+                for (int i = 0; i < taskCount; i++) {
+                    System.out.println((i + 1) + ". " + tasks[i]);
+                }
+            } else {
+                tasks[taskCount] = input;
+                taskCount++;
+                System.out.println("added: " + input);
+            }
             System.out.println(horizontalLine);
             input = scanner.nextLine();
         }
