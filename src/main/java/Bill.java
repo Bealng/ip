@@ -54,14 +54,9 @@ public class Bill {
             markTask(userInput, tasks);
         } else if (normalizedInput.startsWith("unmark ")) {
             unmarkTask(userInput, tasks);
-        } else if (normalizedInput.startsWith("todo ")) {
-            return addTodo(userInput, tasks, taskCount);
-        } else if (normalizedInput.startsWith("deadline ")) {
-            return addDeadline(userInput, tasks, taskCount);
-        } else if (normalizedInput.startsWith("event ")) {
-            return addEvent(userInput, tasks, taskCount);
         } else {
-            return addTask(new Todo(userInput), tasks, taskCount);
+            Task task = Parser.parseTask(userInput);
+            return addTask(task, tasks, taskCount);
         }
 
         return taskCount;
@@ -141,39 +136,6 @@ public class Bill {
      */
     private static int parseTaskIndex(String userInput, String commandPrefix) {
         return Integer.parseInt(userInput.substring(commandPrefix.length())) - 1;
-    }
-
-    /**
-     * Creates a todo from a todo command.
-     */
-    private static int addTodo(String userInput, Task[] tasks, int taskCount) {
-        String description = userInput.substring("todo ".length());
-        return addTask(new Todo(description), tasks, taskCount);
-    }
-
-    /**
-     * Creates a deadline from a deadline command.
-     */
-    private static int addDeadline(String userInput, Task[] tasks, int taskCount) {
-        String deadlineDetails = userInput.substring("deadline ".length());
-        int byIndex = deadlineDetails.toLowerCase().indexOf(" /by ");
-        String description = deadlineDetails.substring(0, byIndex);
-        String by = deadlineDetails.substring(byIndex + " /by ".length());
-        return addTask(new Deadline(description, by), tasks, taskCount);
-    }
-
-    /**
-     * Creates an event from an event command.
-     */
-    private static int addEvent(String userInput, Task[] tasks, int taskCount) {
-        String eventDetails = userInput.substring("event ".length());
-        String normalizedDetails = eventDetails.toLowerCase();
-        int fromIndex = normalizedDetails.indexOf(" /from ");
-        int toIndex = normalizedDetails.indexOf(" /to ", fromIndex);
-        String description = eventDetails.substring(0, fromIndex);
-        String from = eventDetails.substring(fromIndex + " /from ".length(), toIndex);
-        String to = eventDetails.substring(toIndex + " /to ".length());
-        return addTask(new Event(description, from, to), tasks, taskCount);
     }
 
     /**
