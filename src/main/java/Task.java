@@ -1,7 +1,7 @@
 /**
- * Represents a task and whether it has been completed.
+ * Defines the shared completion state and display behaviour of a task.
  */
-public class Task {
+public abstract class Task {
     private final String description;
     private boolean isDone;
 
@@ -43,9 +43,7 @@ public class Task {
      *
      * @return Task type icon.
      */
-    protected String getTypeIcon() {
-        return "T";
-    }
+    protected abstract String getTypeIcon();
 
     /**
      * Returns any timing information displayed after the task description.
