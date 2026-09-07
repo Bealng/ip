@@ -1,3 +1,5 @@
+package bill.task;
+
 /**
  * Represents a task that takes place between a starting and ending time.
  */

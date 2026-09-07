@@ -1,3 +1,5 @@
+package bill.exception;
+
 /**
  * Represents a user input error that Bill can explain and recover from.
  */

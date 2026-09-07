@@ -1,3 +1,5 @@
+package bill.task;
+
 /**
  * Defines the shared completion state and display behaviour of a task.
  */

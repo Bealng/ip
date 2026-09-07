@@ -1,3 +1,5 @@
+package bill.task;
+
 /**
  * Represents a task that should be completed by a specified time.
  */
