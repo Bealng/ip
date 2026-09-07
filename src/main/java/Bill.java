@@ -25,7 +25,11 @@ public class Bill {
             printWelcome();
             String userInput = scanner.nextLine();
             while (!userInput.equalsIgnoreCase("bye")) {
-                taskCount = processInput(userInput, tasks, taskCount);
+                try {
+                    taskCount = processInput(userInput, tasks, taskCount);
+                } catch (BillException exception) {
+                    printError(exception.getMessage());
+                }
                 System.out.println(HORIZONTAL_LINE);
                 userInput = scanner.nextLine();
             }
@@ -40,9 +44,10 @@ public class Bill {
      * @param tasks Tasks currently stored by Bill.
      * @param taskCount Number of tasks currently stored.
      * @return Number of tasks after processing the input.
+     * @throws BillException If the command cannot be completed.
      */
-    private static int processInput(String userInput, Task[] tasks, int taskCount) {
-        String normalizedInput = userInput.toLowerCase();
+    private static int processInput(String userInput, Task[] tasks, int taskCount) throws BillException {
+        String normalizedInput = userInput.strip().toLowerCase();
 
         if (normalizedInput.equals("list")) {
             printTasks(tasks, taskCount);
@@ -60,6 +65,14 @@ public class Bill {
         }
 
         return taskCount;
+    }
+
+    /**
+     * Prints a friendly explanation of an input error.
+     */
+    private static void printError(String message) {
+        System.out.println("Hmm, I couldn't do that:");
+        System.out.println("  " + message);
     }
 
     /**
