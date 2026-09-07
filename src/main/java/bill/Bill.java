@@ -1,3 +1,9 @@
+package bill;
+
+import bill.exception.BillException;
+import bill.parser.Parser;
+import bill.task.Task;
+
 import java.util.Locale;
 import java.util.Scanner;
 

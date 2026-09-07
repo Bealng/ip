@@ -1,3 +1,11 @@
+package bill.parser;
+
+import bill.exception.BillException;
+import bill.task.Deadline;
+import bill.task.Event;
+import bill.task.Task;
+import bill.task.Todo;
+
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
