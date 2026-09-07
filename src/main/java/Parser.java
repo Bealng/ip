@@ -1,4 +1,6 @@
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Converts task-related user input into the corresponding task type.
@@ -10,9 +12,9 @@ public final class Parser {
     private static final String TODO_PREFIX = TODO_COMMAND + " ";
     private static final String DEADLINE_PREFIX = DEADLINE_COMMAND + " ";
     private static final String EVENT_PREFIX = EVENT_COMMAND + " ";
-    private static final String DEADLINE_SEPARATOR = "/by";
-    private static final String EVENT_FROM_SEPARATOR = "/from";
-    private static final String EVENT_TO_SEPARATOR = "/to";
+    private static final Pattern DEADLINE_SEPARATOR = Pattern.compile("(?:^|\\s)/by(?:\\s|$)");
+    private static final Pattern EVENT_FROM_SEPARATOR = Pattern.compile("(?:^|\\s)/from(?:\\s|$)");
+    private static final Pattern EVENT_TO_SEPARATOR = Pattern.compile("(?:^|\\s)/to(?:\\s|$)");
 
     private Parser() {
     }
@@ -54,12 +56,12 @@ public final class Parser {
     private static Deadline parseDeadline(String userInput) throws BillException {
         String deadlineDetails = userInput.substring(DEADLINE_COMMAND.length()).strip();
         String normalizedDetails = deadlineDetails.toLowerCase(Locale.ROOT);
-        int separatorIndex = normalizedDetails.indexOf(DEADLINE_SEPARATOR);
-        if (separatorIndex < 0) {
+        Matcher separator = DEADLINE_SEPARATOR.matcher(normalizedDetails);
+        if (!separator.find()) {
             throw new BillException("A deadline needs '/by'. Try: deadline submit report /by Friday");
         }
-        String description = deadlineDetails.substring(0, separatorIndex).strip();
-        String by = deadlineDetails.substring(separatorIndex + DEADLINE_SEPARATOR.length()).strip();
+        String description = deadlineDetails.substring(0, separator.start()).strip();
+        String by = deadlineDetails.substring(separator.end()).strip();
         if (description.isEmpty()) {
             throw new BillException("A deadline needs a description before '/by'.");
         }
@@ -72,18 +74,17 @@ public final class Parser {
     private static Event parseEvent(String userInput) throws BillException {
         String eventDetails = userInput.substring(EVENT_COMMAND.length()).strip();
         String normalizedDetails = eventDetails.toLowerCase(Locale.ROOT);
-        int fromIndex = normalizedDetails.indexOf(EVENT_FROM_SEPARATOR);
-        if (fromIndex < 0) {
+        Matcher fromSeparator = EVENT_FROM_SEPARATOR.matcher(normalizedDetails);
+        if (!fromSeparator.find()) {
             throw new BillException("An event needs '/from'. Try: event lecture /from 4pm /to 6pm");
         }
-        int toIndex = normalizedDetails.indexOf(EVENT_TO_SEPARATOR,
-                fromIndex + EVENT_FROM_SEPARATOR.length());
-        if (toIndex < 0) {
+        Matcher toSeparator = EVENT_TO_SEPARATOR.matcher(normalizedDetails);
+        if (!toSeparator.find(fromSeparator.end())) {
             throw new BillException("An event needs '/to' after its starting time.");
         }
-        String description = eventDetails.substring(0, fromIndex).strip();
-        String from = eventDetails.substring(fromIndex + EVENT_FROM_SEPARATOR.length(), toIndex).strip();
-        String to = eventDetails.substring(toIndex + EVENT_TO_SEPARATOR.length()).strip();
+        String description = eventDetails.substring(0, fromSeparator.start()).strip();
+        String from = eventDetails.substring(fromSeparator.end(), toSeparator.start()).strip();
+        String to = eventDetails.substring(toSeparator.end()).strip();
         if (description.isEmpty()) {
             throw new BillException("An event needs a description before '/from'.");
         }
