@@ -4,6 +4,8 @@ import bill.exception.BillException;
 import bill.parser.Parser;
 import bill.task.Task;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 
@@ -11,7 +13,6 @@ import java.util.Scanner;
  * Greets the user and manages tasks until the user enters "bye".
  */
 public class Bill {
-    private static final int MAX_TASKS = 100;
     private static final String HORIZONTAL_LINE = "____________________________________________________________";
     private static final String BANNER = " ____  _ _ _ \n"
             + "| __ )(_) | |\n"
@@ -26,8 +27,7 @@ public class Bill {
      */
     public static void main(String[] args) {
         try (Scanner scanner = new Scanner(System.in)) {
-            Task[] tasks = new Task[MAX_TASKS];
-            int taskCount = 0;
+            List<Task> tasks = new ArrayList<>();
 
             printWelcome();
             while (scanner.hasNextLine()) {
@@ -36,7 +36,7 @@ public class Bill {
                     break;
                 }
                 try {
-                    taskCount = processInput(userInput, tasks, taskCount);
+                    processInput(userInput, tasks);
                 } catch (BillException exception) {
                     printError(exception.getMessage());
                 }
@@ -51,30 +51,28 @@ public class Bill {
      *
      * @param userInput User input to process.
      * @param tasks Tasks currently stored by Bill.
-     * @param taskCount Number of tasks currently stored.
-     * @return Number of tasks after processing the input.
      * @throws BillException If the command cannot be completed.
      */
-    private static int processInput(String userInput, Task[] tasks, int taskCount) throws BillException {
+    private static void processInput(String userInput, List<Task> tasks) throws BillException {
         String trimmedInput = userInput.strip();
         String normalizedInput = trimmedInput.toLowerCase(Locale.ROOT);
 
         if (normalizedInput.equals("list")) {
-            printTasks(tasks, taskCount);
+            printTasks(tasks);
         } else if (normalizedInput.equals("help")) {
             printHelp();
         } else if (normalizedInput.equals("stats")) {
-            printStats(tasks, taskCount);
+            printStats(tasks);
         } else if (isCommand(normalizedInput, "mark")) {
-            markTask(trimmedInput, tasks, taskCount);
+            markTask(trimmedInput, tasks);
         } else if (isCommand(normalizedInput, "unmark")) {
-            unmarkTask(trimmedInput, tasks, taskCount);
+            unmarkTask(trimmedInput, tasks);
+        } else if (isCommand(normalizedInput, "delete")) {
+            deleteTask(trimmedInput, tasks);
         } else {
             Task task = Parser.parseTask(trimmedInput);
-            return addTask(task, tasks, taskCount);
+            addTask(task, tasks);
         }
-
-        return taskCount;
     }
 
     private static boolean isCommand(String input, String command) {
@@ -92,14 +90,14 @@ public class Bill {
     /**
      * Prints all stored tasks with their numbers and completion states.
      */
-    private static void printTasks(Task[] tasks, int taskCount) {
-        if (taskCount == 0) {
+    private static void printTasks(List<Task> tasks) {
+        if (tasks.isEmpty()) {
             System.out.println("Your task list is empty. Add something whenever you're ready.");
             return;
         }
         System.out.println("Here are the tasks in your list:");
-        for (int i = 0; i < taskCount; i++) {
-            System.out.println((i + 1) + "." + tasks[i]);
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println((i + 1) + "." + tasks.get(i));
         }
     }
 
@@ -111,6 +109,7 @@ public class Bill {
         System.out.println("  list          - show every task");
         System.out.println("  mark NUMBER   - mark a task as done");
         System.out.println("  unmark NUMBER - mark a task as not done");
+        System.out.println("  delete NUMBER - remove a task");
         System.out.println("  todo TASK     - add a task without a date or time");
         System.out.println("  deadline TASK /by TIME - add a task with a deadline");
         System.out.println("  event TASK /from START /to END - add an event");
@@ -122,20 +121,20 @@ public class Bill {
     /**
      * Prints the total, completed, and remaining task counts.
      */
-    private static void printStats(Task[] tasks, int taskCount) {
-        int completedCount = countCompletedTasks(tasks, taskCount);
-        int remainingCount = taskCount - completedCount;
-        System.out.println("Task stats: " + taskCount + " total, "
+    private static void printStats(List<Task> tasks) {
+        int completedCount = countCompletedTasks(tasks);
+        int remainingCount = tasks.size() - completedCount;
+        System.out.println("Task stats: " + tasks.size() + " total, "
                 + completedCount + " done, " + remainingCount + " remaining.");
     }
 
     /**
      * Returns the number of completed tasks.
      */
-    private static int countCompletedTasks(Task[] tasks, int taskCount) {
+    private static int countCompletedTasks(List<Task> tasks) {
         int completedCount = 0;
-        for (int i = 0; i < taskCount; i++) {
-            if (tasks[i].isDone()) {
+        for (Task task : tasks) {
+            if (task.isDone()) {
                 completedCount++;
             }
         }
@@ -145,21 +144,33 @@ public class Bill {
     /**
      * Marks the task selected by a mark command as completed.
      */
-    private static void markTask(String userInput, Task[] tasks, int taskCount) throws BillException {
-        int taskIndex = parseTaskIndex(userInput, "mark", taskCount);
-        tasks[taskIndex].markAsDone();
+    private static void markTask(String userInput, List<Task> tasks) throws BillException {
+        int taskIndex = parseTaskIndex(userInput, "mark", tasks.size());
+        tasks.get(taskIndex).markAsDone();
         System.out.println("Nice! I've marked this task as done:");
-        System.out.println("  " + tasks[taskIndex]);
+        System.out.println("  " + tasks.get(taskIndex));
     }
 
     /**
      * Marks the task selected by an unmark command as incomplete.
      */
-    private static void unmarkTask(String userInput, Task[] tasks, int taskCount) throws BillException {
-        int taskIndex = parseTaskIndex(userInput, "unmark", taskCount);
-        tasks[taskIndex].markAsNotDone();
+    private static void unmarkTask(String userInput, List<Task> tasks) throws BillException {
+        int taskIndex = parseTaskIndex(userInput, "unmark", tasks.size());
+        tasks.get(taskIndex).markAsNotDone();
         System.out.println("OK, I've marked this task as not done yet:");
-        System.out.println("  " + tasks[taskIndex]);
+        System.out.println("  " + tasks.get(taskIndex));
+    }
+
+    /**
+     * Removes the task selected by a delete command.
+     */
+    private static void deleteTask(String userInput, List<Task> tasks) throws BillException {
+        int taskIndex = parseTaskIndex(userInput, "delete", tasks.size());
+        Task removedTask = tasks.remove(taskIndex);
+        String taskLabel = tasks.size() == 1 ? "task" : "tasks";
+        System.out.println("Noted. I've removed this task:");
+        System.out.println("  " + removedTask);
+        System.out.println("Now you have " + tasks.size() + " " + taskLabel + " in the list.");
     }
 
     /**
@@ -192,18 +203,12 @@ public class Bill {
     /**
      * Stores and displays a newly created task.
      */
-    private static int addTask(Task task, Task[] tasks, int taskCount) throws BillException {
-        if (taskCount >= tasks.length) {
-            throw new BillException("Your task list is full. Bill currently stores at most "
-                    + tasks.length + " tasks.");
-        }
-        tasks[taskCount] = task;
-        int updatedTaskCount = taskCount + 1;
-        String taskLabel = updatedTaskCount == 1 ? "task" : "tasks";
+    private static void addTask(Task task, List<Task> tasks) {
+        tasks.add(task);
+        String taskLabel = tasks.size() == 1 ? "task" : "tasks";
         System.out.println("Got it. I've added this task:");
         System.out.println("  " + task);
-        System.out.println("Now you have " + updatedTaskCount + " " + taskLabel + " in the list.");
-        return updatedTaskCount;
+        System.out.println("Now you have " + tasks.size() + " " + taskLabel + " in the list.");
     }
 
     /**
