@@ -13,8 +13,18 @@ public abstract class Task {
      * @param description Description of the task.
      */
     public Task(String description) {
+        this(description, false);
+    }
+
+    /**
+     * Creates a task with the given description and completion state.
+     *
+     * @param description Description of the task.
+     * @param isDone Whether the task is completed.
+     */
+    public Task(String description, boolean isDone) {
         this.description = description;
-        this.isDone = false;
+        this.isDone = isDone;
     }
 
     /**
@@ -38,6 +48,15 @@ public abstract class Task {
      */
     public boolean isDone() {
         return isDone;
+    }
+
+    /**
+     * Returns this task's description.
+     *
+     * @return Description of the task.
+     */
+    public String getDescription() {
+        return description;
     }
 
     /**

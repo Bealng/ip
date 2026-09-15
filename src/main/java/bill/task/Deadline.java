@@ -13,8 +13,28 @@ public class Deadline extends Task {
      * @param by Due date or time as entered by the user.
      */
     public Deadline(String description, String by) {
-        super(description);
+        this(description, by, false);
+    }
+
+    /**
+     * Creates a deadline with its description, due time, and completion state.
+     *
+     * @param description Description of the deadline.
+     * @param by Due date or time as entered by the user.
+     * @param isDone Whether the deadline is completed.
+     */
+    public Deadline(String description, String by, boolean isDone) {
+        super(description, isDone);
         this.by = by;
+    }
+
+    /**
+     * Returns the deadline's due date or time.
+     *
+     * @return Due date or time as entered by the user.
+     */
+    public String getBy() {
+        return by;
     }
 
     @Override
