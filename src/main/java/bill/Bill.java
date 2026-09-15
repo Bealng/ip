@@ -2,6 +2,7 @@ package bill;
 
 import bill.exception.BillException;
 import bill.parser.Parser;
+import bill.storage.Storage;
 import bill.task.Task;
 
 import java.util.ArrayList;
@@ -27,7 +28,8 @@ public class Bill {
      */
     public static void main(String[] args) {
         try (Scanner scanner = new Scanner(System.in)) {
-            List<Task> tasks = new ArrayList<>();
+            Storage storage = new Storage();
+            List<Task> tasks = loadTasks(storage);
 
             printWelcome();
             while (scanner.hasNextLine()) {
@@ -36,7 +38,7 @@ public class Bill {
                     break;
                 }
                 try {
-                    processInput(userInput, tasks);
+                    processInput(userInput, tasks, storage);
                 } catch (BillException exception) {
                     printError(exception.getMessage());
                 }
@@ -51,9 +53,10 @@ public class Bill {
      *
      * @param userInput User input to process.
      * @param tasks Tasks currently stored by Bill.
+     * @param storage Storage used to persist task changes.
      * @throws BillException If the command cannot be completed.
      */
-    private static void processInput(String userInput, List<Task> tasks) throws BillException {
+    private static void processInput(String userInput, List<Task> tasks, Storage storage) throws BillException {
         String trimmedInput = userInput.strip();
         String normalizedInput = trimmedInput.toLowerCase(Locale.ROOT);
 
@@ -64,14 +67,14 @@ public class Bill {
         } else if (normalizedInput.equals("stats")) {
             printStats(tasks);
         } else if (isCommand(normalizedInput, "mark")) {
-            markTask(trimmedInput, tasks);
+            markTask(trimmedInput, tasks, storage);
         } else if (isCommand(normalizedInput, "unmark")) {
-            unmarkTask(trimmedInput, tasks);
+            unmarkTask(trimmedInput, tasks, storage);
         } else if (isCommand(normalizedInput, "delete")) {
-            deleteTask(trimmedInput, tasks);
+            deleteTask(trimmedInput, tasks, storage);
         } else {
             Task task = Parser.parseTask(trimmedInput);
-            addTask(task, tasks);
+            addTask(task, tasks, storage);
         }
     }
 
@@ -144,9 +147,10 @@ public class Bill {
     /**
      * Marks the task selected by a mark command as completed.
      */
-    private static void markTask(String userInput, List<Task> tasks) throws BillException {
+    private static void markTask(String userInput, List<Task> tasks, Storage storage) throws BillException {
         int taskIndex = parseTaskIndex(userInput, "mark", tasks.size());
         tasks.get(taskIndex).markAsDone();
+        storage.saveTasks(tasks);
         System.out.println("Nice! I've marked this task as done:");
         System.out.println("  " + tasks.get(taskIndex));
     }
@@ -154,9 +158,10 @@ public class Bill {
     /**
      * Marks the task selected by an unmark command as incomplete.
      */
-    private static void unmarkTask(String userInput, List<Task> tasks) throws BillException {
+    private static void unmarkTask(String userInput, List<Task> tasks, Storage storage) throws BillException {
         int taskIndex = parseTaskIndex(userInput, "unmark", tasks.size());
         tasks.get(taskIndex).markAsNotDone();
+        storage.saveTasks(tasks);
         System.out.println("OK, I've marked this task as not done yet:");
         System.out.println("  " + tasks.get(taskIndex));
     }
@@ -164,9 +169,10 @@ public class Bill {
     /**
      * Removes the task selected by a delete command.
      */
-    private static void deleteTask(String userInput, List<Task> tasks) throws BillException {
+    private static void deleteTask(String userInput, List<Task> tasks, Storage storage) throws BillException {
         int taskIndex = parseTaskIndex(userInput, "delete", tasks.size());
         Task removedTask = tasks.remove(taskIndex);
+        storage.saveTasks(tasks);
         String taskLabel = tasks.size() == 1 ? "task" : "tasks";
         System.out.println("Noted. I've removed this task:");
         System.out.println("  " + removedTask);
@@ -203,12 +209,23 @@ public class Bill {
     /**
      * Stores and displays a newly created task.
      */
-    private static void addTask(Task task, List<Task> tasks) {
+    private static void addTask(Task task, List<Task> tasks, Storage storage) throws BillException {
         tasks.add(task);
+        storage.saveTasks(tasks);
         String taskLabel = tasks.size() == 1 ? "task" : "tasks";
         System.out.println("Got it. I've added this task:");
         System.out.println("  " + task);
         System.out.println("Now you have " + tasks.size() + " " + taskLabel + " in the list.");
+    }
+
+    private static List<Task> loadTasks(Storage storage) {
+        try {
+            return storage.loadTasks();
+        } catch (BillException exception) {
+            printError(exception.getMessage());
+            System.out.println("I'll start with an empty task list for this session.");
+            return new ArrayList<>();
+        }
     }
 
     /**

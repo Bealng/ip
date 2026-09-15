@@ -13,6 +13,16 @@ public class Todo extends Task {
         super(description);
     }
 
+    /**
+     * Creates a todo with the given description and completion state.
+     *
+     * @param description Description of the todo.
+     * @param isDone Whether the todo is completed.
+     */
+    public Todo(String description, boolean isDone) {
+        super(description, isDone);
+    }
+
     @Override
     protected String getTypeIcon() {
         return "T";
