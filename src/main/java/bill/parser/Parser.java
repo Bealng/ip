@@ -4,6 +4,7 @@ import bill.command.AddCommand;
 import bill.command.Command;
 import bill.command.DeleteCommand;
 import bill.command.ExitCommand;
+import bill.command.FindCommand;
 import bill.command.HelpCommand;
 import bill.command.ListCommand;
 import bill.command.MarkCommand;
@@ -60,6 +61,13 @@ public final class Parser {
         }
         if (normalizedInput.equals("stats")) {
             return new StatsCommand();
+        }
+        if (isCommand(normalizedInput, "find", "find ")) {
+            String keyword = trimmedInput.substring("find".length()).strip();
+            if (keyword.isEmpty()) {
+                throw new BillException("Tell me what to find. Try: find book");
+            }
+            return new FindCommand(keyword);
         }
         if (isCommand(normalizedInput, "mark", "mark ")) {
             return new MarkCommand(parseTaskNumber(trimmedInput, "mark"));

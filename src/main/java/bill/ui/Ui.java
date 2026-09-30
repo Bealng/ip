@@ -125,6 +125,7 @@ public class Ui implements AutoCloseable {
     public void showHelp() {
         output.println("Here are the commands I understand:");
         output.println("  list          - show every task");
+        output.println("  find KEYWORD  - search task descriptions");
         output.println("  mark NUMBER   - mark a task as done");
         output.println("  unmark NUMBER - mark a task as not done");
         output.println("  delete NUMBER - remove a task");
@@ -147,6 +148,23 @@ public class Ui implements AutoCloseable {
         int remainingCount = tasks.size() - completedCount;
         output.println("Task stats: " + tasks.size() + " total, "
                 + completedCount + " done, " + remainingCount + " remaining.");
+    }
+
+    /**
+     * Displays tasks matching a search, numbered within the results only.
+     *
+     * @param matches Tasks whose descriptions contain the keyword.
+     * @param keyword Search text to mention when nothing matches.
+     */
+    public void showFound(List<Task> matches, String keyword) {
+        if (matches.isEmpty()) {
+            output.println("No tasks match '" + keyword + "'.");
+            return;
+        }
+        output.println("Here are the matching tasks in your list:");
+        for (int i = 0; i < matches.size(); i++) {
+            output.println((i + 1) + "." + matches.get(i));
+        }
     }
 
     /**
