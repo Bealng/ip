@@ -1,5 +1,14 @@
 package bill.parser;
 
+import bill.command.AddCommand;
+import bill.command.Command;
+import bill.command.DeleteCommand;
+import bill.command.ExitCommand;
+import bill.command.HelpCommand;
+import bill.command.ListCommand;
+import bill.command.MarkCommand;
+import bill.command.StatsCommand;
+import bill.command.UnmarkCommand;
 import bill.exception.BillException;
 import bill.task.Deadline;
 import bill.task.Event;
@@ -11,7 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Converts task-related user input into the corresponding task type.
+ * Interprets a full user input line as a command, including task details and numbers.
  */
 public final class Parser {
     private static final String TODO_COMMAND = "todo";
@@ -28,7 +37,60 @@ public final class Parser {
     }
 
     /**
+     * Converts one user input line into the command that should be executed.
+     *
+     * @param userInput Full command entered by the user.
+     * @return Parsed command object.
+     * @throws BillException If the command or its arguments are invalid.
+     */
+    public static Command parse(String userInput) throws BillException {
+        String trimmedInput = userInput.strip();
+        String normalizedInput = trimmedInput.toLowerCase(Locale.ROOT);
+
+        if (normalizedInput.equals("bye")) {
+            return new ExitCommand();
+        }
+        if (normalizedInput.equals("list")) {
+            return new ListCommand();
+        }
+        if (normalizedInput.equals("help")) {
+            return new HelpCommand();
+        }
+        if (normalizedInput.equals("stats")) {
+            return new StatsCommand();
+        }
+        if (isCommand(normalizedInput, "mark", "mark ")) {
+            return new MarkCommand(parseTaskNumber(trimmedInput, "mark"));
+        }
+        if (isCommand(normalizedInput, "unmark", "unmark ")) {
+            return new UnmarkCommand(parseTaskNumber(trimmedInput, "unmark"));
+        }
+        if (isCommand(normalizedInput, "delete", "delete ")) {
+            return new DeleteCommand(parseTaskNumber(trimmedInput, "delete"));
+        }
+        return new AddCommand(parseTask(trimmedInput));
+    }
+
+    /**
+     * Parses a one-based task number without checking whether that task exists.
+     * TaskList owns the task count and performs that second check.
+     */
+    private static int parseTaskNumber(String userInput, String command) throws BillException {
+        String taskNumberText = userInput.substring(command.length()).strip();
+        if (taskNumberText.isEmpty()) {
+            throw new BillException("Tell me which task number to " + command + ". Try: " + command + " 1");
+        }
+        try {
+            return Integer.parseInt(taskNumberText);
+        } catch (NumberFormatException exception) {
+            throw new BillException("'" + taskNumberText + "' is not a valid task number. Try: "
+                    + command + " 1");
+        }
+    }
+
+    /**
      * Converts user input into a todo, deadline, or event.
+     *
      * @param userInput Task command entered by the user.
      * @return Task represented by the command.
      * @throws BillException If the command is unknown or its details are incomplete.
