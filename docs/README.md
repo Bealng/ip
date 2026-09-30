@@ -10,7 +10,9 @@ Bill is a friendly command-line task tracker. Give Bill a to-do, deadline, or ev
 
 ## Get started
 
-You need **Java 25**. From the project folder, run `./gradlew run` on macOS or Linux, or `./gradlew.bat run` on Windows. You can also open the project in IntelliJ IDEA with JDK 25 and run `bill.Bill.main()`.
+You need **Java 25**. Download `bill.jar` from the [latest GitHub release](https://github.com/Bealng/ip/releases/latest), open a terminal in the folder containing the JAR, and run `java -jar bill.jar`. Run it from the same folder each time so Bill can find your saved tasks.
+
+If you have the source code instead, run `./gradlew run` on macOS or Linux, or `./gradlew.bat run` on Windows, from the project folder. You can also open the project in IntelliJ IDEA with JDK 25 and run `bill.Bill.main()`.
 
 Type one command per line. Try this short session:
 

@@ -6,7 +6,12 @@ Bill is a command-line task tracker for to-dos, deadlines, and events. It can fi
 
 ## Run Bill
 
-Install **Java 25**, then run the following from the project folder:
+Install **Java 25**. To use the packaged app, download `bill.jar` from the
+[latest release](https://github.com/Bealng/ip/releases/latest), open a terminal in
+the folder containing the JAR, and run `java -jar bill.jar`. Bill saves your tasks
+relative to that folder, so run it from the same folder each time.
+
+To run Bill from source instead, use the following from the project folder:
 
 | System | Command |
 | --- | --- |
