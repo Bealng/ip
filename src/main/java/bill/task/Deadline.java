@@ -1,10 +1,19 @@
 package bill.task;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Locale;
+import java.util.Optional;
+
 /**
  * Represents a task that should be completed by a specified time.
  */
 public class Deadline extends Task {
+    private static final DateTimeFormatter DISPLAY_DATE = DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
+
     private final String by;
+    private final LocalDate byDate;
 
     /**
      * Creates an incomplete deadline with its description and due time.
@@ -26,6 +35,19 @@ public class Deadline extends Task {
     public Deadline(String description, String by, boolean isDone) {
         super(description, isDone);
         this.by = by;
+        byDate = parseStoredDate(by);
+    }
+
+    /**
+     * Creates an incomplete deadline with a real calendar date.
+     *
+     * @param description Description of the deadline.
+     * @param byDate Due date parsed from the user's ISO date.
+     */
+    public Deadline(String description, LocalDate byDate) {
+        super(description);
+        this.byDate = byDate;
+        by = byDate.toString();
     }
 
     /**
@@ -37,6 +59,27 @@ public class Deadline extends Task {
         return by;
     }
 
+    /**
+     * Returns the parsed due date when one is available. Older free-form deadlines
+     * remain usable but do not have a calendar date.
+     *
+     * @return Parsed due date, or empty for legacy free-form text.
+     */
+    public Optional<LocalDate> getByDate() {
+        return Optional.ofNullable(byDate);
+    }
+
+    /**
+     * Recognizes ISO dates when loading saved tasks while retaining older text values.
+     */
+    private static LocalDate parseStoredDate(String by) {
+        try {
+            return LocalDate.parse(by);
+        } catch (DateTimeParseException exception) {
+            return null;
+        }
+    }
+
     @Override
     protected String getTypeIcon() {
         return "D";
@@ -44,6 +87,7 @@ public class Deadline extends Task {
 
     @Override
     protected String getDetails() {
-        return " (by: " + by + ")";
+        String displayBy = byDate == null ? by : byDate.format(DISPLAY_DATE);
+        return " (by: " + displayBy + ")";
     }
 }
