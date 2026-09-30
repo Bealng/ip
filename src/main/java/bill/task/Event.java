@@ -50,11 +50,21 @@ public class Event extends Task {
         return to;
     }
 
+    /**
+     * Identifies this task as an event in task listings.
+     *
+     * @return The event type icon.
+     */
     @Override
     protected String getTypeIcon() {
         return "E";
     }
 
+    /**
+     * Includes the event's starting and ending times in its display text.
+     *
+     * @return The time-range suffix shown after the description.
+     */
     @Override
     protected String getDetails() {
         return " (from: " + from + " to: " + to + ")";

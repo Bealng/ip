@@ -21,6 +21,14 @@ public class AddCommand extends Command {
         this.task = task;
     }
 
+    /**
+     * Adds the task, saves the updated list, and confirms the addition.
+     *
+     * @param tasks Task list to update.
+     * @param ui User interface for the confirmation.
+     * @param storage Storage used to persist the updated list.
+     * @throws BillException If the updated list cannot be saved.
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws BillException {
         tasks.add(task);

@@ -80,11 +80,21 @@ public class Deadline extends Task {
         }
     }
 
+    /**
+     * Identifies this task as a deadline in task listings.
+     *
+     * @return The deadline type icon.
+     */
     @Override
     protected String getTypeIcon() {
         return "D";
     }
 
+    /**
+     * Formats a calendar due date for display, or keeps a legacy free-form due time unchanged.
+     *
+     * @return The due-date suffix shown after the description.
+     */
     @Override
     protected String getDetails() {
         String displayBy = byDate == null ? by : byDate.format(DISPLAY_DATE);

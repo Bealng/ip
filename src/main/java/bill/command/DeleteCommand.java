@@ -21,6 +21,14 @@ public class DeleteCommand extends Command {
         this.taskNumber = taskNumber;
     }
 
+    /**
+     * Deletes the numbered task, saves the list, and confirms the deletion.
+     *
+     * @param tasks Task list to update.
+     * @param ui User interface for the confirmation.
+     * @param storage Storage used to persist the updated list.
+     * @throws BillException If the task number is invalid or the list cannot be saved.
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws BillException {
         Task removedTask = tasks.delete(taskNumber);
