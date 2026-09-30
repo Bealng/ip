@@ -5,6 +5,7 @@ import bill.exception.BillException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Owns Bill's tasks and the operations that change their contents or completion state.
@@ -107,6 +108,25 @@ public class TaskList {
             }
         }
         return count;
+    }
+
+    /**
+     * Finds tasks whose descriptions contain the requested text, ignoring case.
+     * The returned list is separate from Bill's numbered task list, so searching
+     * never changes or reorders the stored tasks.
+     *
+     * @param keyword Text to search for in task descriptions.
+     * @return Matching tasks in their original order.
+     */
+    public List<Task> find(String keyword) {
+        String searchText = keyword.toLowerCase(Locale.ROOT);
+        List<Task> matches = new ArrayList<>();
+        for (Task task : tasks) {
+            if (task.getDescription().toLowerCase(Locale.ROOT).contains(searchText)) {
+                matches.add(task);
+            }
+        }
+        return List.copyOf(matches);
     }
 
     /**
