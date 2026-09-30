@@ -129,11 +129,12 @@ public class Ui implements AutoCloseable {
         output.println("  unmark NUMBER - mark a task as not done");
         output.println("  delete NUMBER - remove a task");
         output.println("  todo TASK     - add a task without a date or time");
-        output.println("  deadline TASK /by TIME - add a task with a deadline");
+        output.println("  deadline TASK /by DATE - add a deadline (e.g. 2026-10-02)");
         output.println("  event TASK /from START /to END - add an event");
         output.println("  stats         - show your progress");
         output.println("  bye           - exit Bill");
         output.println("  Use todo, deadline, or event to add a task.");
+        output.println("  ISO dates such as 2026-10-02 display as Oct 02 2026.");
     }
 
     /**

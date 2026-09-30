@@ -15,6 +15,8 @@ import bill.task.Event;
 import bill.task.Task;
 import bill.task.Todo;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -137,6 +139,13 @@ public final class Parser {
         }
         if (by.isEmpty()) {
             throw new BillException("A deadline needs a date or time after '/by'.");
+        }
+        if (by.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            try {
+                return new Deadline(description, LocalDate.parse(by));
+            } catch (DateTimeParseException exception) {
+                throw new BillException("That isn't a valid date. Use yyyy-MM-dd, e.g. 2026-10-02.");
+            }
         }
         return new Deadline(description, by);
     }
