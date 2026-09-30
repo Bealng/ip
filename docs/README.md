@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Bill User Guide
+permalink: /index.html
 ---
 
 # Bill User Guide
