@@ -14,6 +14,13 @@ public class ListCommand extends Command {
     public ListCommand() {
     }
 
+    /**
+     * Displays the tasks in their current numbered order.
+     *
+     * @param tasks Task list to display.
+     * @param ui User interface for the list.
+     * @param storage Unused storage.
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         ui.showTasks(tasks);

@@ -23,6 +23,11 @@ public class Todo extends Task {
         super(description, isDone);
     }
 
+    /**
+     * Identifies this task as a todo in task listings.
+     *
+     * @return The todo type icon.
+     */
     @Override
     protected String getTypeIcon() {
         return "T";

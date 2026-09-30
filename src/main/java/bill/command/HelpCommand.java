@@ -14,6 +14,13 @@ public class HelpCommand extends Command {
     public HelpCommand() {
     }
 
+    /**
+     * Displays the available commands.
+     *
+     * @param tasks Unused task list.
+     * @param ui User interface for the help text.
+     * @param storage Unused storage.
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         ui.showHelp();

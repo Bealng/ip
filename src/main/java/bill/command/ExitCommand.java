@@ -14,11 +14,23 @@ public class ExitCommand extends Command {
     public ExitCommand() {
     }
 
+    /**
+     * Does nothing; the application loop checks {@link #isExit()} to stop.
+     *
+     * @param tasks Unused task list.
+     * @param ui Unused user interface.
+     * @param storage Unused storage.
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         // Bill prints the farewell after the command loop ends.
     }
 
+    /**
+     * Identifies this command as the one that ends the conversation.
+     *
+     * @return Always true.
+     */
     @Override
     public boolean isExit() {
         return true;
